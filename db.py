@@ -1,12 +1,54 @@
+# from enum import Flag
 import time
 import pymongo
 import datetime
+import time
 
 # Establish a connection to the MongoDB database
 client = pymongo.MongoClient('mongodb+srv://dixitabhay52:aditya@cluster0.an2xlfa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 db = client['aadi']
 col1 = db["Available books"]
 col2 = db['issued books Books']
+col3 = db["users"]
+
+def registerUser():
+    print("Registering User now\nEnter your required details\n")
+    name = input("Enter Your Name")
+    id = input("Enter your ID")
+    password = input("Enter your Password")
+
+    query = {"_id" : id}
+
+    user = col3.count_documents(query)
+
+    if user > 0:
+        print(f'{id} already exist')
+    else:
+        new_user = {
+            "_id" : id,
+            "Name" : name,
+            "Password" : password
+        }
+
+        col3.insert_one(new_user)
+        print(f'USER : {name}\nID : {id}\nUser registered successfully')
+        loginUser()
+
+def loginUser():
+    print('Enter your Credentials')
+    id = input("enter your id : ")
+    password = input("Enter your Password")
+
+    query = {"_id" : id}
+
+    user = col3.count_documents(query)
+
+    if user > 0:
+        print('Login Successful')
+        main()
+        
+    else :
+        print("credentials entered are not matched in out database")
 
 def add_book(id, bName, Aname):
     """
@@ -213,76 +255,92 @@ def check_issued_books_by_std(stdid):
         for book in books:
             print(f'{book["_id"]}\t{book["Book Name"]}\t{book["Author Name"]}')
 
-# Main loop to handle user interaction
-while True:
-    print("""
-    Welcome to the Library!
+    # Main loop to handle user interaction
 
-    1. Add Book to the library
-    2. Remove Book from the library
-    3. Update Book
-    4. View Books
-    5. Find Book
-    6. Issue Book
-    7. Return Book
-    8. View issued Books
-    9. Find book by Student ID
-    0. Exit
-    """)
 
-    try:
-        choice = int(input("Enter your choice (1-9 or 0 to exit): "))
-    except ValueError:
-        print("Invalid input. Please enter a number between 1 and 9 or 0 to exit.")
-        continue  # Skip to the next iteration of the loop
+def main():
+    while True:
+        print("""
+        Welcome to the Library!
 
-    match choice:
-        case 1:
-            try:
-                id = int(input("Enter ID number: "))
-                book_name = input("Enter book name: ")
-                author_name = input("Enter author name: ")
-                add_book(id, book_name, author_name)
-            except ValueError:
-                print("Invalid input for ID or book name. Please enter numbers for ID and strings for book and author names.")
-        case 2:
-            try:
-                id = int(input("Enter ID number: "))
-                book_name = input("Enter book name (optional): ")
-                remove_book(id, book_name)
-            except ValueError:
-                print("Invalid input for ID. Please enter a number.")
-        case 3:
-            try:
-                id = int(input("Enter ID number: "))
-                book_name = input("Enter book name: ")
-                author_name = input("Enter author name: ")
-                update_book(id, book_name, author_name)
-            except ValueError:
-                print("Invalid input for ID or book name. Please enter numbers for ID and strings for book and author names.")
-        case 4:
-            view_book()
-        case 5:
-            book_name = input("Enter book name to search: ")
-            find_book(book_name)
-        case 6:
-            id = int(input('Enter ID of book: '))
-            book_name = input('Enter book name: ')
-            author_name = input('Enter author name: ')
-            issue_book(id, book_name, author_name)
-        case 7:
-            id = int(input('Enter ID of book: '))
-            book_name = input('Enter book name: ')
-            author_name = input('Enter author name: ')
-            return_book(id, book_name, author_name)
-        case 8:
-            view_issued_books()
-        case 9:
-            stdid = input('Enter the student ID: ')
-            check_issued_books_by_std(stdid)
-        case 0:
-            print("Exiting the library. Thank you for using our services!")
-            break
-        case _:
-            print("Invalid choice. Please enter a number between 1 and 9 or 0 to exit.")
-    time.sleep(2)
+        1. Add Book to the library
+        2. Remove Book from the library
+        3. Update Book
+        4. View Books
+        5. Find Book
+        6. Issue Book
+        7. Return Book
+        8. View issued Books
+        9. Find book by Student ID
+        0. Exit
+        """)
+
+        try:
+            choice = int(input("Enter your choice (1-9 or 0 to exit): "))
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 9 or 0 to exit.")
+            continue  # Skip to the next iteration of the loop
+
+        match choice:
+            case 1:
+                try:
+                    id = int(input("Enter ID number: "))
+                    book_name = input("Enter book name: ")
+                    author_name = input("Enter author name: ")
+                    add_book(id, book_name, author_name)
+                except ValueError:
+                    print("Invalid input for ID or book name. Please enter numbers for ID and strings for book and author names.")
+            case 2:
+                try:
+                    id = int(input("Enter ID number: "))
+                    book_name = input("Enter book name (optional): ")
+                    remove_book(id, book_name)
+                except ValueError:
+                    print("Invalid input for ID. Please enter a number.")
+            case 3:
+                try:
+                    id = int(input("Enter ID number: "))
+                    book_name = input("Enter book name: ")
+                    author_name = input("Enter author name: ")
+                    update_book(id, book_name, author_name)
+                except ValueError:
+                    print("Invalid input for ID or book name. Please enter numbers for ID and strings for book and author names.")
+            case 4:
+                view_book()
+            case 5:
+                book_name = input("Enter book name to search: ")
+                find_book(book_name)
+            case 6:
+                id = int(input('Enter ID of book: '))
+                book_name = input('Enter book name: ')
+                author_name = input('Enter author name: ')
+                issue_book(id, book_name, author_name)
+            case 7:
+                id = int(input('Enter ID of book: '))
+                book_name = input('Enter book name: ')
+                author_name = input('Enter author name: ')
+                return_book(id, book_name, author_name)
+            case 8:
+                view_issued_books()
+            case 9:
+                stdid = input('Enter the student ID: ')
+                check_issued_books_by_std(stdid)
+            case 0:
+                print("Exiting the library. Thank you for using our services!")
+                break
+            case _:
+                print("Invalid choice. Please enter a number between 1 and 9 or 0 to exit.")
+        time.sleep(2)
+
+flag = True
+while flag  == True:
+    a = int(input("1-register\n2-Login\n"))
+    if a == 1:
+        registerUser()
+        flag = False
+    elif a==2:
+        loginUser()
+        flag = False
+    else:
+        print("enter valid no.")
+
